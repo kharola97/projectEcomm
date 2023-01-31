@@ -87,4 +87,31 @@ const createUser = async (req, res) => {
     }
   };
 
+  const login = async function(req,res){
+    try {
+    let body = req.body
+    let{email,password}= body
+    if(Object.keys(body).length==0) return res.status(400).send({status:false,message:"Please enter some data"})
+    if(!email|| !password) return res.status(400).send({status:false,message:"Please enter email and password"})
+    let findUser = await userModel.findOne({email:body.email,password:body.password})
+    if(!findUser) return res.status(400).send({status:false,message:"Invalid email or password"})
+
+    bcrypt.compare(password, findUser.password, function (error, findUser) {
+        if (error) return res.status(400).send({ status: false, message: error.message })
+      else findUser == true
+    });
+
+    let token = jwt.sign({userId:findUser._id},"Secret-key",{expiresIn:"24h"} )
+
+    
+    return res.status(200).send({status:true,message:"User login successfull",data:{userId:findUser._id, token}})
+  } catch (error) {
+    return res.status(500).send({ status: false, message: error.message });
+
+  }
+}
+
+
+
 module.exports.createUser=createUser
+module.exports.login = login
