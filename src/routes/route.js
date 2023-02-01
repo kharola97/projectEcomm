@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
+const middleware =require('../middlewares/auth')
+
 
 
 
@@ -9,7 +11,8 @@ const router = express.Router();
 
 router.post('/register')
 router.post('/login')
-router.get('/user/:userId')
+router.get('/user/:userId/profile',middleware.authentication)
+router.put('/user/:userId/profile',middleware.authentication)
 
 
 
