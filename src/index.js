@@ -3,7 +3,7 @@ const mongoose= require('mongoose')
 const route =require('./routes/route')
 const app= express()
 const mult = require('multer')
-const route =require('./routes/route')
+
 
 app.use(mult().any())
 app.use(express.json())
