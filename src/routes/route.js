@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const middleware =require('../middlewares/auth')
-const userController=require('../controllers/userController')
+const userController=require('../controllers/userController');
+const usermodel = require('../models/usermodel');
 
 
 
@@ -11,9 +12,9 @@ const userController=require('../controllers/userController')
 
 
 router.post('/register',userController.createUser)
-router.post('/login')
-router.get('/user/:userId/profile',middleware.authentication)
-router.put('/user/:userId/profile',middleware.authentication)
+router.post('/login',userController.login)
+router.get('/user/:userId/profile',middleware.authentication,middleware.userAuthorization,userController.getUser)
+router.put('/user/:userId/profile',middleware.authentication,middleware.userAuthorization,userController.updateUser)
 
 
 
