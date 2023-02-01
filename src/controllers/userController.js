@@ -144,3 +144,28 @@ exports.createUser = async (req, res) => {
       return res.status(500).send({ status: false, message: error.message });
     }
   };
+
+
+  /****************************get user data***************************************************************/
+
+  
+exports.getUserData = async function(req,res){
+
+  try{
+      let userId = req.params.userId
+
+      if (!mongoose.isValidObjectId(userId)) {
+        return res.status(400).send({ status: false, message: "Invalid userId" });
+      }
+
+      let userData = await userModel.findById(userId)
+      if(!userData){
+          return res.status(404).send({status:false,message:"User not found"})
+      }
+
+      return res.status(200).send({status:true,message:"User profile details",data:userData})
+
+  } catch(err){
+      return res.status(500).send({status:false,message:err.message})
+  }
+}
