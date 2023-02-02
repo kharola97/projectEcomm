@@ -102,4 +102,64 @@ const getProducts= async function(req,res){
     catch (error) {
         res.status(500).send({ message: error.message })
       }
-}
+}      
+
+const getProductById = async function(req,res){
+    try {
+      
+    
+     let productId = req.params.productId
+     if (!mongoose.Types.ObjectId.isValid(productId))
+     return res.status(400).send({ status: false, message: "Invalid product ID" });
+  
+  
+     let findProducts = await productmodel.find({_id:productId,isDeleted:false})
+     if(findProducts.length==0) return res.status(404).send({status:false,message:"product not found"})
+     return res.status(200).send({status:true,message:"success", data:findProducts})
+    } catch (error) {
+      return res.status(500).send({status:false,message:error.message})
+    }
+  }
+  
+  // Updates a product by changing at least one or all fields
+  // Check if the productId exists (must have isDeleted false and is present in collection). If it doesn't, return an HTTP status 404 with a response body like this
+  
+  const updateProduct = async function(req,res){
+    let data = req.body
+    let productId = req.params.productId
+    if(!mongoose.Types.Object.isValid(productId)) return res.status(400).send({status:false,message:"invalid product id"})
+    if(Object.keys(data).length==0) return res.status(400).send({status:false,message:"nothing to update"})
+    let findProduct = await productmodel.findOne({_id:productId,isDeleted:false}) 
+    if(!findProduct) return res.status(404).send({status:false,message:"No product found"})
+  
+    let updateProduct = {}
+    if(data.title){
+      let 
+    }
+  
+  
+  }
+
+const deleteProduct = async function (req, res) {
+  try {
+    let productId = req.params.productId;
+    const deleted = await productModel.findOneAndUpdate(
+      { _id: productId, isDeleted: false },
+      { isDeleted: true },
+      { new: true }
+    );
+    if(!deleted){
+        return res.status(400).send({status:false, message:"Products will not deleted"})
+    }
+    res.status(200).send({ status: true, message: "Success", data: deleted });
+  } catch (error) {
+    return res.status(500).send({ status: false, message: error.message });
+  }
+};
+
+module.exports.createProduct = createProduct;
+module.exports.getProducts = getProducts;
+module.exports.getProductById = getProductById;
+module.exports.updateProduct=updateProduct
+module.exports.deleteProduct = deleteProduct;
+
