@@ -17,9 +17,9 @@ router.get('/user/:userId/profile',middleware.authentication,middleware.userAuth
 router.put('/user/:userId/profile',middleware.authentication,middleware.userAuthorization,userController.updateUser)
 
 
-router.post('/products',middleware.authentication,productController.createProduct)
+router.post('/products',productController.createProduct)
 router.get('/products',productController.getProducts)
-router.get('/products/:productId',productController.getProductById)
+// router.get('/products/:productId',productController.getProductById)
 
 
 

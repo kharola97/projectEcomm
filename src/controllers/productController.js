@@ -19,6 +19,7 @@ const createProduct = async function(req,res){
     if(!isValid(data.price)) return res.status(400).send({status:false,message:"price is mandatory"})
     data.price=data.price.trim()
     if(parseFloat(data.price)!=data.price) return res.status(400).send({status:false,message:"price should only be a Number"})
+    data.price=Number(data.price).toFixed(2)
 
     if(!isValid(data.currencyId)) return res.status(400).send({status:false,message:"currencyId is mandatory"})
     data.currencyId=data.currencyId.trim().toUpperCase()
@@ -102,3 +103,7 @@ const getProducts= async function(req,res){
         res.status(500).send({ message: error.message })
       }
 }
+
+
+module.exports.createProduct=createProduct
+module.exports.getProducts=getProducts
