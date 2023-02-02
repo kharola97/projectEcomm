@@ -115,8 +115,8 @@ const getProductById = async function (req, res) {
             return res.status(400).send({ status: false, message: "Invalid product ID" });
 
 
-        let findProducts = await productmodel.find({ _id: productId, isDeleted: false })
-        if (findProducts.length == 0) return res.status(404).send({ status: false, message: "product not found" })
+        let findProducts = await productmodel.findOne({ _id: productId, isDeleted: false })
+        if (!findProducts.length) return res.status(404).send({ status: false, message: "product not found" })
         return res.status(200).send({ status: true, message: "success", data: findProducts })
     } catch (error) {
         return res.status(500).send({ status: false, message: error.message })
@@ -151,7 +151,7 @@ const deleteProduct = async function (req, res) {
             { new: true }
         );
         if (!deleted) {
-            return res.status(400).send({ status: false, message: "Products will not deleted" })
+            return res.status(400).send({ status: false, message: "Product already deleted" })
         }
         res.status(200).send({ status: true, message: "Success", data: deleted });
     } catch (error) {
