@@ -103,7 +103,3 @@ const getProducts= async function(req,res){
         res.status(500).send({ message: error.message })
       }
 }
-
-
-module.exports.createProduct=createProduct
-module.exports.getProducts=getProducts
