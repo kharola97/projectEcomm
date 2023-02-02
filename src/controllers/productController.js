@@ -126,21 +126,100 @@ const getProductById = async function (req, res) {
 // Updates a product by changing at least one or all fields
 // Check if the productId exists (must have isDeleted false and is present in collection). If it doesn't, return an HTTP status 404 with a response body like this
 
-const updateProduct = async function (req, res) {
+const updateProduct = async function(req,res){
     let data = req.body
     let productId = req.params.productId
-    if (!mongoose.Types.Object.isValid(productId)) return res.status(400).send({ status: false, message: "invalid product id" })
-    if (Object.keys(data).length == 0) return res.status(400).send({ status: false, message: "nothing to update" })
-    let findProduct = await productmodel.findOne({ _id: productId, isDeleted: false })
-    if (!findProduct) return res.status(404).send({ status: false, message: "No product found" })
-
+    if(!mongoose.Types.ObjectId.isValid(productId)) return res.status(400).send({status:false,message:"invalid product id"})
+    if(Object.keys(data).length==0) return res.status(400).send({status:false,message:"nothing to update"})
+    let findProduct = await productModel.findOne({_id:productId,isDeleted:false}) 
+    if(!findProduct) return res.status(404).send({status:false,message:"No product found"})
+  
     let updateProduct = {}
-    if (data.title) {
-        let
+    if(data.title){
+    if(!isValid(data.title)) return res.status(400).send({status:false,message:"Invalid title"})
+    //if (!isValidName(data.title)) return res.status(400).send({ status: false, message: "give valid title" });
+   data.title=data.title.trim().toUpperCase()
+    const Title= await productModel.findOne({title:data.title, isDeleted:false})
+    if(Title) return res.status(400).send({status:false,message:"title should be unique"})
+    updateProduct.title = data.title
     }
+    if(data.description){
+        data.description = data.description.trim()
+        console.log(data.description);
+        if(data.description.length==0) return res.status(400).send({status:false,message:"description cannot be empty"})
+   updateProduct.description = data.description
+    }
+  if(data.price){
+    data.price=data.price.trim()
+    if(parseFloat(data.price)!=data.price) return res.status(400).send({status:false,message:"price should only be a Number"})
+    updateProduct.price = data.price
+  }
+  if(data.isFreeShipping){
+    data.isFreeShipping=data.isFreeShipping.trim()
+    if(!isBoolean(data.isFreeShipping)) return res.status(400).send({status:false,message:"isFreeShipping can only accept true or false"})
+    updateProduct.isFreeShipping = data.isFreeShipping
+  }
+  if(data.file) { 
+    const imageUrl= await uploadFile(file[0])
+    updateProduct.productImage=imageUrl
+  }
+  if(data.currencyId) {
+  data.currencyId=data.currencyId.trim().toUpperCase()
+  if(!['INR'].includes(data.currencyId)) return res.status(400).send({status:false,message:"currencyId should be valid"})
+   updateProduct.currencyId = data.currencyId
+  }
+  if(data.currencyFormat){
+    data.currencyFormat=data.currencyFormat.trim().toUpperCase()
+    if(!['₹'].includes(data.currencyFormat)) return res.status(400).send({status:false,message:"currencyFormat should be valid"})
+  updateProduct.currencyFormat = data.currencyFormat
+  
+  }
+  
+  
+  
+  if(data.style){
+    data.style=data.style.trim()
+    updateProduct.style = data.style
+  }
+  
+  if(data.availableSizes){
+    data.availableSizes = data.availableSizes.trim().toUpperCase()
+    
+    let updateSize = data.availableSizes.split(",")
+    //console.log(updateSize);
+    let sizes = findProduct.availableSizes
+    let finalSize = []
+    //console.log(sizes);
+    for(i=0;i<updateSize.length;i++){
+        if(["S", "XS","M","X", "L","XXL", "XL"].includes(updateSize[i])){
+          if(!sizes.includes(updateSize[i])){
+          if(!finalSize.includes(updateSize[i])){
+          finalSize.push(updateSize[i])
+          }
+          }
+        }
+    }
+    console.log(finalSize);
+  
+    //console.log(finalSize);
+    if(finalSize.length==0) return res.status(400).send({status:false,message:"can only update sizes in 'XS,S,M,L,X,XXL,XL or the size you want to update already exists"})
+    
+    
+    
+    updateProduct.availableSizes = [...findProduct.availableSizes ,...finalSize]
+  }
+  if(data.installments){
+    if(data.installments.trim()){
+        if(parseInt(data.installments)!=data.installments) return res.status(400).send({status:false,message:"installments should only be a Number"})
+    }
+    updateProduct.installments = data.installments
+  }
+  let finalProduct =  await productModel.findOneAndUpdate({_id:productId},updateProduct,{new:true})
+  
+  return res.status(200).send({status:true,message:"Product successfully updated", data:finalProduct})
+  
+  }
 
-
-}
 
 const deleteProduct = async function (req, res) {
     try {
