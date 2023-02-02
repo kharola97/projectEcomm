@@ -102,3 +102,24 @@ const getProducts= async function(req,res){
         res.status(500).send({ message: error.message })
       }
 }
+
+const deleteProducts = async function (req, res) {
+  try {
+    let productId = req.params.productId;
+    const deleted = await productModel.findOneAndUpdate(
+      { _id: productId, isDeleted: false },
+      { isDeleted: true },
+      { new: true }
+    );
+    if(!deleted){
+        return res.status(400).send({status:false, message:"Products will not deleted"})
+    }
+    res.status(200).send({ status: true, message: "Success", data: deleted });
+  } catch (error) {
+    return res.status(500).send({ status: false, message: error.message });
+  }
+};
+
+module.exports.createProduct = createProduct;
+module.exports.getProducts = getProducts;
+module.exports.deleteProducts = deleteProducts;
