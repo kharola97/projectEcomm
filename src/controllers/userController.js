@@ -7,6 +7,31 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
 const ObjectId = require('mongoose').Types.ObjectId
 
+
+
+
+// password hashing
+const passwordHashing =async function(password){
+  return new Promise((resolve, reject) => {
+      const saltRounds = 10 //default
+      bcrypt.hash(password, saltRounds, function (err, hash) {
+  
+        if (err) return  reject(res.status(400).send({ status: false, message: "invalid password" }))
+        else return resolve(hash)
+          
+      });
+  })
+}
+
+
+
+
+
+
+
+
+
+
 const createUser = async (req, res) => {
   try {
     let data = req.body;
@@ -47,11 +72,7 @@ const createUser = async (req, res) => {
     if (!(data.password.match(/.*[a-zA-Z]/))) return res.status(400).send({ status: false, error: "Password should contain alphabets" }) // password must be alphabetic //
     if (!(data.password.match(/.*\d/))) return res.status(400).send({ status: false, error: "Password should contain digits" })// we can use number also //
     // encrypt the password
-    const saltRounds = 10 //default
-    bcrypt.hash(data.password, saltRounds, function (err, hash) {
-      if (err) return res.status(400).send({ status: false, message: "invalid password" })
-      else data.password = hash
-    });
+    data.password= await passwordHashing(data.password)
 
 
 
@@ -194,43 +215,40 @@ const updateUser = async function (req, res) {
       if (!(updationDetails.password.match(/.*[a-zA-Z]/))) return res.status(400).send({ status: false, error: "Password should contain alphabets" }) // password must be alphabetic //
       if (!(updationDetails.password.match(/.*\d/))) return res.status(400).send({ status: false, error: "Password should contain digits" })// we can use number also //
       // encrypt the password
-      const saltRounds = 10 //default
-      bcrypt.hash(updationDetails.password, saltRounds, function (err, hash) {
-        if (err) return res.status(400).send({ status: false, message: "invalid password" })
-        else updationDetails.password = hash
-      });
+      updationDetails.password= await passwordHashing(updationDetails.password)
+
     }
-    if(updationDetails.address.shipping.street=="") return res.status(400).send({status:false,message:"you can not update the shipping street with empty string"})
-    if(updationDetails.address.shipping.city=="") return res.status(400).send({status:false,message:"you can not update the shipping city with empty string"})
-    if(updationDetails.address.shipping.pincode=="") return res.status(400).send({status:false,message:"you can not update the shipping pincode with empty string"})
-    if(updationDetails.address.shipping.street){
-      if(!(updationDetails.address.shipping.street).trim())  return res.status(400).send({status:false,message:"you can not update the shipping street with empty "})
+
+    
+
+    if(updationDetails.address){
+      let shippingAdd= userData.address.shipping
+      if(updationDetails.address.shipping){
+        if(updationDetails.address.shipping.street) shippingAdd.street=updationDetails.address.shipping.street
+        if(updationDetails.address.shipping.city) shippingAdd.city=updationDetails.address.shipping.city
+        if(updationDetails.address.shipping.pincode) {
+          if(parseInt(updationDetails.address.shipping.pincode)!=updationDetails.address.shipping.pincode) res.status(400).send({status:false,message:" shipping pincode is invalid"})
+          shippingAdd.pincode=updationDetails.address.shipping.pincode
+        }
+        
+      }
+      let billingAdd= userData.address.billing
+      if(updationDetails.address.billing){
+        if(updationDetails.address.billing.street) billingAdd.street=updationDetails.address.billing.street
+        if(updationDetails.address.billing.city) billingAdd.city=updationDetails.address.billing.city
+        if(updationDetails.address.billing.pincode) {
+          if(parseInt(updationDetails.address.billing.pincode)!=updationDetails.address.billing.pincode) res.status(400).send({status:false,message:"billing pincode is invalid"})
+          billingAdd.pincode=updationDetails.address.billing.pincode
+        }
+        
+      }
+
+      updationDetails.address.shipping=shippingAdd
+      updationDetails.address.billing=billingAdd
     }
-    if(updationDetails.address.shipping.city){
-      if(!(updationDetails.address.shipping.city).trim())  return res.status(400).send({status:false,message:"you can not update the shipping city with empty "})
-    }
-    if(updationDetails.address.shipping.pincode){
-      if(!(updationDetails.address.shipping.pincode).trim())  return res.status(400).send({status:false,message:"you can not update the shipping pincode with empty "})
-      if(parseInt(updationDetails.address.shipping.pincode)!=updationDetails.address.shipping.pincode) return res.status(400).send({status:false,message:"shipping pincode is invalid"})
-    }
-  
   
 
-    if(updationDetails.address.billing.street=="") return res.status(400).send({status:false,message:"you can not update the billing street with empty string"})
-    if(updationDetails.address.billing.city=="") return res.status(400).send({status:false,message:"you can not update the billing city with empty string"})
-    if(updationDetails.address.billing.pincode=="") return res.status(400).send({status:false,message:"you can not update the billing pincode with empty string"})
-    if(updationDetails.address.billing.street){
-      if(!(updationDetails.address.billing.street).trim())  return res.status(400).send({status:false,message:"you can not update the billing street with empty "})
-    }
-    if(updationDetails.address.billing.city){
-      if(!(updationDetails.address.billing.city).trim())  return res.status(400).send({status:false,message:"you can not update the billing city with empty "})
-    }
-    if(updationDetails.address.billing.pincode){
-      if(!(updationDetails.address.billing.pincode).trim())  return res.status(400).send({status:false,message:"you can not update the billing pincode with empty "})
-      if(parseInt(updationDetails.address.billing.pincode)!=updationDetails.address.shipping.pincode) return res.status(400).send({status:false,message:"billing pincode is invalid"})
-    }
-  
-    const updatedUser =await UserModel.findByIdAndUpdate(userId,updationDetails,{new:true})
+    const updatedUser =await UserModel.findByIdAndUpdate(userId,{$set:updationDetails},{new:true})
     res.status(200).send({status:true,message:"User profile updated",data:updatedUser})
   }
   catch(err){
