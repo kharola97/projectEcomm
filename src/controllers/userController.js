@@ -41,10 +41,10 @@ const createUser = async (req, res) => {
 
 
     if (!isValid(data.fname)) return res.status(400).send({ status: false, message: "fname is mandatory" });
-    if (parseInt(data.fname)) return res.status(400).send({ status: false, message: "give valid name" });
+    if ((data.fname).match(/^[a-zA-Z_ ]+$/)) return res.status(400).send({ status: false, message: "give valid name" });
 
     if (!isValid(data.lname)) return res.status(400).send({ status: false, message: "lname is mandatory" });
-    if (parseInt(data.lname)) return res.status(400).send({ status: false, message: "give valid last name" });
+    if ((data.lname).match(/^[a-zA-Z_ ]+$/)) return res.status(400).send({ status: false, message: "give valid name" });
     //check validation for email ---------------------------------------------------------------
     if (!isValid(data.email)) return res.status(400).send({ status: false, message: "email is mandatory" });
     if (!validator.isEmail(data.email)) return res.status(400).send({ status: false, msg: "please enter valid email address!" })
@@ -219,7 +219,7 @@ const updateUser = async function (req, res) {
 
     }
 
-    
+
 
     if(updationDetails.address){
       let shippingAdd= userData.address.shipping
