@@ -68,8 +68,27 @@ const cartDetails =async function(req,res){
 
 
 const deleteCart= async function(req,res){
-
-}
+    try {
+        let userId = req.params.userId;
+        const deleted = await cartModel.findOneAndUpdate(
+        {_id: userId, isDeleted: false},
+        {isDeleted: true},
+        {$inc:{totalPrice: 0, totalItems: 0}},
+        {new: true}
+        )
+        const cart = await cartModel.findById({_id: userId})
+        if(cart){
+            return res.status(200).send({status:true, message:"cart exit"});
+        }
+        const user = await UserModel.findById({_id: userId})
+        if(user){
+            return res.status(200).send({status:true, message:"user exit"});
+        }
+        res.status(204).send({status:true, message:"Success", data: deleted});
+    } catch (error) {
+        return res.status(500).send({ status: false, message: error.message });
+    }
+};
 
 
 
