@@ -88,7 +88,7 @@ const removeProductFromCart = async function (req, res) {
 
     let items = checkCart.items
     let filteritem = items.filter(x => x.productId == productId)
-    if (filteritem.length == 0) return res.status(400).send({ status: false, message: "Product doesnt exist in cart items" })
+    if (filteritem.length == 0) return res.status(400).send({ status: false, message: "Product is exist in cart items" })
 
 
     if (removeProduct == 0 || filteritem[0].quantity==1) {

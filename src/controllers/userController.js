@@ -96,7 +96,7 @@ const createUser = async (req, res) => {
     /*-----------------------------------upload files on s3 storage and getting the link----------------------------------------------------*/
 
     if (files.length > 0) {
-      uploadedFileURL = await uploadFile(files[0]);
+      var uploadedFileURL = await uploadFile(files[0]);
     } else {
       return res.status(400).send({ status: false, message: "No file found, it is mandatory" });
     }
