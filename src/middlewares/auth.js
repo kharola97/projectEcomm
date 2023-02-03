@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-
+const ObjectId = require('mongoose').Types.ObjectId
 
 const authentication = async function(req,res,next){
     
@@ -22,6 +22,7 @@ const authentication = async function(req,res,next){
 
 const userAuthorization = async function (req,res,next){
     const userId=req.params.userId
+    if(!(ObjectId.isValid(userId))) return res.status(400).send({status:false,message:"user id is not valid"})
     if(userId==req.userId) return next()
     else return res.status(403).send({status:false,message:"you are not authorized personn to see profile"})
 }
