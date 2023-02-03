@@ -1,3 +1,4 @@
+
 const cartModel = require('../models/cartmodel')
 const { isValid } = require('../validators/validation')
 const ObjectId = require('mongoose').Types.ObjectId
@@ -5,8 +6,11 @@ const userModel= require('../models/usermodel')
 const productModel=require('../models/productmodel')
 const mongoose =require('mongoose')
 
-const createCart = async function (req, res) {
-    const data = req.body
+
+
+
+const createCart =async function(req,res){
+    const data=req.body
     const userId = req.params.userId
     if (!ObjectId.isValid(userId)) return res.status(400).send({ status: false, message: "userId is not valid" })
 
@@ -115,9 +119,29 @@ const cartDetails = async function (req, res) {
 }
 
 
-const deleteCart = async function (req, res) {
+const deleteCart= async function(req,res){
+    try {
+        let userId = req.params.userId;
 
-}
+        if(!ObjectId.isValid(userId)) return res.status(400).send({status:false,message:"userId invalid"})
+
+        const user = await userModel.findById(userId)
+        if(!user) return res.status(404).send({status:true, message:"user not  found"});
+
+        // const cart = await cartModel.findOne({userId: userId})
+        // if(!cart) return res.status(404).send({status:true, message:"cart not found "});
+        
+
+        
+        const updatedCart = await cartModel.findOneAndUpdate({userId: userId},{$set:{items:[],totalPrice: 0, totalItems: 0}},{new: true})
+        
+
+        res.status(204).send({status:true, message:"Success", data: updatedCart});
+    } catch (error) {
+        return res.status(500).send({ status: false, message: error.message });
+    }
+};
+
 
 
 
