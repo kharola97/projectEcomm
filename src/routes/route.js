@@ -5,6 +5,7 @@ const middleware =require('../middlewares/auth')
 const userController=require('../controllers/userController');
 const productController= require('../controllers/productController')
 const cartController=require('../controllers/cartController');
+const orderController=require('../controllers/orderController')
 const { RoboMaker } = require('aws-sdk');
 
 
@@ -29,8 +30,13 @@ router.delete('/products/:productId',productController.deleteProduct)
 
 router.post('/users/:userId/cart',middleware.authentication,middleware.userAuthorization, cartController.createCart)
 router.put('/users/:userId/cart',middleware.authentication, middleware.userAuthorization,cartController.removeProductFromCart)
-router.get('/users/:userId/cart',cartController.cartDetails)
-router.delete('/users/:userId/cart',cartController.deleteCart)
+router.get('/users/:userId/cart',middleware.authentication, middleware.userAuthorization, cartController.cartDetails)
+router.delete('/users/:userId/cart',middleware.authentication, middleware.userAuthorization,cartController.deleteCart)
+
+
+
+router.post('/users/:userId/orders',middleware.authentication, middleware.userAuthorization,orderController.createOrder)
+router.put('/users/:userId/orders',middleware.authentication, middleware.userAuthorization,orderController.updateOrderStatus)
 
 
 

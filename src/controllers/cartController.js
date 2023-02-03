@@ -41,7 +41,7 @@ const createCart =async function(req,res){
         }
         else {
             product[0].quantity = product[0].quantity + 1
-            const updatedCart = await cartModel.findOneAndUpdate({ userId: data.userId }, { $set: { items: items }, $inc: { totalPrice: productData.price, totalItems: 1 } }, { new: true }).populate('items.productId')
+            const updatedCart = await cartModel.findOneAndUpdate({ userId: data.userId }, { $set: { items: items }, $inc: { totalPrice: productData.price} }, { new: true }).populate('items.productId')
             return res.status(200).send({ status: true, message: "Success", data: updatedCart })
         }
     }
@@ -96,7 +96,7 @@ const removeProductFromCart = async function (req, res) {
         const productToBeRemove =items.filter(x=>x.productId == productId)
         const restOfProducts = items.filter(x => x.productId != productId)
 
-        let newCart = await cartModel.findOneAndUpdate({ userId: userId }, {$set:{ items: restOfProducts},$inc:{ totalPrice: -(productToBeRemove[0].quantity*findProduct.price),totalItems:-(productToBeRemove[0].quantity)}}, { new: true }).populate('items.productId')
+        let newCart = await cartModel.findOneAndUpdate({ userId: userId }, {$set:{ items: restOfProducts},$inc:{ totalPrice: -(productToBeRemove[0].quantity*findProduct.price),totalItems:-1}}, { new: true }).populate('items.productId')
         return res.status(200).send({ status: true, message: "success", data: newCart })
 
     }
@@ -108,7 +108,7 @@ const removeProductFromCart = async function (req, res) {
         }
 
 
-        let newCart = await cartModel.findOneAndUpdate({ userId: userId }, {$set:{ items: items},$inc:{ totalPrice: -findProduct.price, totalItems:-1}}, { new: true }).populate('items.productId')
+        let newCart = await cartModel.findOneAndUpdate({ userId: userId }, {$set:{ items: items},$inc:{ totalPrice: -findProduct.price}}, { new: true }).populate('items.productId')
         return res.status(200).send({ status: true, message: "success", data: newCart })
     }
 }

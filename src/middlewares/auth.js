@@ -4,7 +4,7 @@ const ObjectId = require('mongoose').Types.ObjectId
 const authentication = async function(req,res,next){
     
     let token=req.headers['authorization']
-    console.log(token)
+
     if(!token) return res.status(401).send({status:false,message:"not getting token"})
     
     token = token.replace("Bearer ","")
