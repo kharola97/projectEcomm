@@ -115,6 +115,16 @@ const removeProductFromCart = async function (req, res) {
 
 
 const cartDetails = async function (req, res) {
+    let userId = req.params.userId;
+
+    if(!ObjectId.isValid(userId)) return res.status(400).send({status:false,message:"userId invalid"})
+
+    const user = await userModel.findById(userId)
+    if(!user) return res.status(404).send({status:true, message:"user not  found"});
+
+    const cartDetatil= await cartModel.findOne({userId:userId}).populate('items.productId')
+    res.status(200).send({status:true, message:"Success",data:cartDetatil})
+
 
 }
 
@@ -136,7 +146,7 @@ const deleteCart= async function(req,res){
         const updatedCart = await cartModel.findOneAndUpdate({userId: userId},{$set:{items:[],totalPrice: 0, totalItems: 0}},{new: true})
         
 
-        res.status(204).send({status:true, message:"Success", data: updatedCart});
+        res.status(200).send({status:true, message:"Cart clear", data: updatedCart});
     } catch (error) {
         return res.status(500).send({ status: false, message: error.message });
     }
