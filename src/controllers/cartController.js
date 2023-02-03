@@ -80,7 +80,7 @@ const deleteCart= async function(req,res){
         if(cart){
             return res.status(200).send({status:true, message:"cart exit"});
         }
-        const user = await UserModel.findById({_id: userId})
+        const user = await userModel.findById({_id: userId})
         if(user){
             return res.status(200).send({status:true, message:"user exit"});
         }
