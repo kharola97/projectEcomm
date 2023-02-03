@@ -4,6 +4,8 @@ const router = express.Router();
 const middleware =require('../middlewares/auth')
 const userController=require('../controllers/userController');
 const productController= require('../controllers/productController')
+const cartController=require('../controllers/cartController');
+const { RoboMaker } = require('aws-sdk');
 
 
 
@@ -22,6 +24,12 @@ router.get('/products',productController.getProducts)
 router.get('/products/:productId',productController.getProductById)
 router.put('/products/:productId',productController.updateProduct)
 router.delete('/products/:productId',productController.deleteProduct)
+
+
+router.post('/users/:userId/cart',cartController.createCart)
+router.put('/users/:userId/cart',cartController.removeProduct)
+router.get('/users/:userId/cart',cartController.cartDetails)
+router.delete('/users/:userId/cart',cartController.deleteCart)
 
 
 
