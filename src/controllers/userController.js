@@ -74,7 +74,9 @@ const createUser = async (req, res) => {
     // encrypt the password
     data.password= await passwordHashing(data.password)
 
-
+    if(!data.address) return res.status(400).send({status:false,message:"address is mandatory"})
+    data.address=JSON.parse(data.address)
+    console.log(data.address)
 
     if (!isValid(data.address.shipping.street)) return res.status(400).send({ status: false, message: "shipping address street is mandatory" });
     if (!isValid(data.address.shipping.city)) return res.status(400).send({ status: false, message: "shipping address city is mandatory" });
