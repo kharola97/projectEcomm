@@ -57,6 +57,7 @@ const updateOrderStatus =async function(req,res){
     try{
         let userId = req.params.userId;
         let orderId= req.body.orderId
+      
         
         if(!ObjectId.isValid(userId)) return res.status(400).send({status:false,message:"userId invalid"})
         if(!ObjectId.isValid(orderId)) return res.status(400).send({status:false,message:"orderId invalid"})
@@ -66,11 +67,13 @@ const updateOrderStatus =async function(req,res){
     
         const order = await orderModel.findById(orderId)
         if(!order) return res.status(404).send({status:true, message:"order not  found"});
+        if(order.status=='cancled') return res.status(400).send({status:false,message:"order is already cancled"})
     
         //second layer authorization
         if(order.userId!=userId) return res.status(403).send({status:false,message:"you are not authorized to update order status"})
     
         if(order.cancellable==true) {
+            
             const updatedOrder =await orderModel.findByIdAndUpdate(orderId,{$set:{status:'cancled'}},{new:true})
             return res.status(200).send({status:true,message:"Success",data:updatedOrder})
         }
