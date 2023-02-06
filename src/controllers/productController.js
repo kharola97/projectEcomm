@@ -14,6 +14,12 @@ const createProduct = async function (req, res) {
     data.title = data.title.trim().toUpperCase()
     const dataWithTitle = await productModel.findOne({ title: data.title, isDeleted: false })
     if (dataWithTitle) return res.status(400).send({ status: false, message: "title already exist" })
+    
+
+
+    const titleWithDeleteedTrue=await productModel.findOneAndUpdate({ title: data.title, isDeleted: true },{isDeleted:false})
+    if(titleWithDeleteedTrue)     return res.status(400).send({status:false,message:"title already exist you can not create again same product but you can update that product details "})
+
 
     if (!isValid(data.description)) return res.status(400).send({ status: false, message: "description is mandatory" })
 
