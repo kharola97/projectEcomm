@@ -19,6 +19,10 @@ const createCart =async function(req,res){
     
         data.userId=userId
     
+        if(data.cartId) {
+            if(!ObjectId.isValid(data.cartId)) return res.status(400).send({status:false,message:"cart Id is not valid"})
+           
+        }
     
     
         if (!isValid(data.productId)) return res.status(400).send({ status: false, message: "productId is mandatory" })
