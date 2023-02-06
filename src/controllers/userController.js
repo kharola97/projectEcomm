@@ -69,8 +69,8 @@ const createUser = async (req, res) => {
     // password validation --------------------------------
     if (!isValid(data.password)) return res.status(400).send({ status: false, message: "password is mandatory" });
     if (data.password.length < 8 || data.password.length > 15) return res.status(400).send({ status: false, message: "password length should be in range 8-15" });
-    if (!(data.password.match(/.*[a-zA-Z]/))) return res.status(400).send({ status: false, error: "Password should contain alphabets" }) // password must be alphabetic //
-    if (!(data.password.match(/.*\d/))) return res.status(400).send({ status: false, error: "Password should contain digits" })// we can use number also //
+    if (!(data.password.match(/.*[a-zA-Z]/))) return res.status(400).send({ status: false, message: "Password should contain alphabets" }) // password must be alphabetic //
+    if (!(data.password.match(/.*\d/))) return res.status(400).send({ status: false, message: "Password should contain digits" })// we can use number also //
     // encrypt the password
     data.password= await passwordHashing(data.password)
 
