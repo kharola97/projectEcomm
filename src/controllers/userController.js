@@ -75,8 +75,9 @@ const createUser = async (req, res) => {
     data.password= await passwordHashing(data.password)
 
     if(!data.address) return res.status(400).send({status:false,message:"address is mandatory"})
-    data.address=JSON.parse(data.address)
-    console.log(data.address)
+    
+    if(typeof(data.password)==String) data.address=JSON.parse(data.address)
+   
 
     if (!isValid(data.address.shipping.street)) return res.status(400).send({ status: false, message: "shipping address street is mandatory" });
     if (!isValid(data.address.shipping.city)) return res.status(400).send({ status: false, message: "shipping address city is mandatory" });
@@ -226,6 +227,7 @@ const updateUser = async function (req, res) {
     }
 
 
+    if(typeof(updationDetails.password)==String) updationDetails.address=JSON.parse(updationDetails.address)
 
 
     if(updationDetails.address){
