@@ -82,12 +82,12 @@ const createUser = async (req, res) => {
     if (!isValid(data.address.shipping.street)) return res.status(400).send({ status: false, message: "shipping address street is mandatory" });
     if (!isValid(data.address.shipping.city)) return res.status(400).send({ status: false, message: "shipping address city is mandatory" });
     if (!data.address.shipping.pincode) return res.status(400).send({ status: false, message: "shipping address pincode is mandatory" });
-    if (parseInt(data.address.shipping.pincode) != data.address.shipping.pincode) return res.status(400).send({ status: false, message: "shipping address pincode should only be Number" });
+    if (parseInt(data.address.shipping.pincode) != data.address.shipping.pincode ||updationDetails.address.shipping.pincode.length!=6) return res.status(400).send({ status: false, message: "shipping address pincode should only be Number" });
 
     if (!isValid(data.address.billing.street)) return res.status(400).send({ status: false, message: "billing address street is mandatory" });
     if (!isValid(data.address.billing.city)) return res.status(400).send({ status: false, message: "billing address city is mandatory" });
     if (!data.address.billing.pincode) return res.status(400).send({ status: false, message: "billing address pincode is mandatory" });
-    if (parseInt(data.address.billing.pincode) != data.address.billing.pincode) return res.status(400).send({ status: false, message: "billing address pincode should only be Number" });
+    if (parseInt(data.address.billing.pincode) != data.address.billing.pincode || updationDetails.address.billing.pincode.length!=6) return res.status(400).send({ status: false, message: "billing address pincode should only be Number" });
 
 
     data.fname = data.fname.toLowerCase();
@@ -156,8 +156,8 @@ const getUser = async function (req, res) {
     if (!userData) return res.status(404).send({ status: true, message: "User not found" })
     res.status(200).send({ status: true, message: "User profile details", data: userData })
   }
-  catch(err){
-    return res.status(500).send({ status: false, message: error.message });
+  catch(error){
+    return res.status(500).send({ status: false, message:error.message});
   }
 }
 
@@ -239,7 +239,7 @@ const updateUser = async function (req, res) {
         if(updationDetails.address.shipping.street) shippingAdd.street=updationDetails.address.shipping.street
         if(updationDetails.address.shipping.city) shippingAdd.city=updationDetails.address.shipping.city
         if(updationDetails.address.shipping.pincode) {
-          if(parseInt(updationDetails.address.shipping.pincode)!=updationDetails.address.shipping.pincode) return res.status(400).send({status:false,message:" shipping pincode is invalid"})
+          if(parseInt(updationDetails.address.shipping.pincode)!=updationDetails.address.shipping.pincode || updationDetails.address.shipping.pincode.length!=6) return res.status(400).send({status:false,message:" shipping pincode is invalid"})
           shippingAdd.pincode=updationDetails.address.shipping.pincode
         }
         
@@ -250,7 +250,7 @@ const updateUser = async function (req, res) {
         if(updationDetails.address.billing.street) billingAdd.street=updationDetails.address.billing.street
         if(updationDetails.address.billing.city) billingAdd.city=updationDetails.address.billing.city
         if(updationDetails.address.billing.pincode) {
-          if(parseInt(updationDetails.address.billing.pincode)!=updationDetails.address.billing.pincode) return  res.status(400).send({status:false,message:"billing pincode is invalid"})
+          if(parseInt(updationDetails.address.billing.pincode)!=updationDetails.address.billing.pincode || updationDetails.address.billing.pincode.length!=6) return  res.status(400).send({status:false,message:"billing pincode is invalid"})
           billingAdd.pincode=updationDetails.address.billing.pincode
         }
         
