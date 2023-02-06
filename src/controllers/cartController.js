@@ -17,7 +17,7 @@ const createCart =async function(req,res){
         const user = await userModel.findOne({ _id: userId })
         if (!user) return res.status(400).send({ status: false, message: "user not found" })
     
-        data.userId=userId
+        
     
         if(data.cartId) {
             if(!ObjectId.isValid(data.cartId)) return res.status(400).send({status:false,message:"cart Id is not valid"})
@@ -51,7 +51,7 @@ const createCart =async function(req,res){
         }
         else {
             const dataForCreate = {}
-            dataForCreate.userId = data.userId
+            dataForCreate.userId = userId
             dataForCreate.items = []
             dataForCreate.items.push({ productId: data.productId, quantity: 1 })
             dataForCreate.totalPrice = productData.price
