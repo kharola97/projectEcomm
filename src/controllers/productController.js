@@ -8,6 +8,7 @@ const createProduct = async function (req, res) {
     try{
         const file = req.files
         const data = req.body
+        
         if (Object.keys(data).length == 0) return res.status(400).send({ status: false, message: "body is mandatory" })
     
         if (!isValid(data.title)) return res.status(400).send({ status: false, message: "title is mandatory" })
@@ -43,6 +44,7 @@ const createProduct = async function (req, res) {
         }
         if (data.isFreeShipping == "") data.isFreeShipping = false
     
+        
         if (file.length == 0) return res.status(400).send({ status: false, message: "productImage is mandatory" })
         const imageUrl = await uploadFile(file[0])
         data.productImage = imageUrl
@@ -56,7 +58,7 @@ const createProduct = async function (req, res) {
         if(!isValid(data.availableSizes)) return res.status(400).send({status:false,message:"atleast one size is required"})
         data.availableSizes = data.availableSizes.split(",")
         data.availableSizes = data.availableSizes.filter(x => x.trim() != "")
-        data.availableSizes=data.availableSizes.map(x=>x.trim())
+        data.availableSizes=data.availableSizes.map(x=>x.trim().toUpperCase())
         if (data.availableSizes.length == 0) return res.status(400).send({ status: false, message: "at least one size is required ['S', 'XS','M','X', 'L','XXL', 'XL']" })
         let newArr = data.availableSizes.filter(x => !["S", "XS", "M", "X", "L", "XXL", "XL"].includes(x))
         if (newArr.length != 0) return res.status(400).send({ status: false, message: `sizes ${newArr} should be presented in ["S","XS","M","X","L","XXL","XL"] ` })
@@ -69,7 +71,7 @@ const createProduct = async function (req, res) {
         }
     
         const productData = await productModel.create(data)
-        res.status(201).send({ status: false, message: "Success", data: productData })
+        res.status(201).send({ status: true, message: "Success", data: productData })
     
     }
     catch(error){
@@ -91,7 +93,8 @@ const getProducts = async function (req, res) {
 
         let filterSize = {}
         if (query.size != undefined) {
-
+            if(Array.isArray(query.size)) query.size= query.size.map(x=>x.trim().toUpperCase())
+            else query.size=query.size.trim().toUpperCase()
             filterSize.availableSizes = { $in: query.size }
         }
         if (query.size == undefined)  filterSize.isDeleted = false
@@ -145,7 +148,7 @@ const getProductById = async function (req, res) {
 
         let findProduct = await productModel.findOne({ _id: productId, isDeleted: false })
         if (!findProduct) return res.status(404).send({ status: false, message: "product not found" })
-        return res.status(200).send({ status: true, message: "success", data: findProduct })
+        return res.status(200).send({ status: true, message: "Success", data: findProduct })
     } catch (error) {
         return res.status(500).send({ status: false, message: error.message })
     }
@@ -160,20 +163,21 @@ const updateProduct = async function (req, res) {
         let file=req.files
         let productId = req.params.productId
         if (!mongoose.Types.ObjectId.isValid(productId)) return res.status(400).send({ status: false, message: "invalid product id" })
-        if (Object.keys(data).length == 0 && file==null) return res.status(400).send({ status: false, message: "nothing to update" })
+        if (Object.keys(data).length == 0 && file==undefined) return res.status(400).send({ status: false, message: "nothing to update" })
         let findProduct = await productModel.findOne({ _id: productId, isDeleted: false })
         if (!findProduct) return res.status(404).send({ status: false, message: "No product found" })
     
         let updateProduct = {}
     
         if (data.title) {
-    
+            if(!isValid(data.title)) return res.status(400).send({status:false,message:"title not valid"})
             data.title = data.title.trim().toUpperCase()
             const Title = await productModel.findOne({ title: data.title, isDeleted: false })
             if (Title) return res.status(400).send({ status: false, message: "title should be unique" })
             updateProduct.title = data.title
         }
         if (data.description) {
+            if(!isValid(data.description)) return res.status(400).send({status:false,message:"description not valid"})
             data.description = data.description.trim()
             if (data.description.length == 0) return res.status(400).send({ status: false, message: "description cannot be empty" })
             updateProduct.description = data.description
@@ -218,7 +222,8 @@ const updateProduct = async function (req, res) {
         if (data.availableSizes) {
             let productSizes=findProduct.availableSizes
             data.availableSizes = data.availableSizes.split(",")
-            data.availableSizes = data.availableSizes.filter(x => x.trim() != "")
+            data.availableSizes = data.availableSizes.filter(x => x.trim() != "").map(x=>x.trim().toUpperCase())
+            
             if (data.availableSizes.length == 0) return res.status(400).send({ status: false, message: "at least one size is required ['S', 'XS','M','X', 'L','XXL', 'XL']" })
             let newArr = data.availableSizes.filter(x => !["S", "XS", "M", "X", "L", "XXL", "XL"].includes(x))
             if (newArr.length != 0) return res.status(400).send({ status: false, message: `sizes ${newArr} should be presented in ["S","XS","M","X","L","XXL","XL"] ` })
@@ -228,9 +233,9 @@ const updateProduct = async function (req, res) {
             updateProduct.availableSizes=sizes
         }
         if (data.installments) {
-            if (data.installments.trim()) {
-                if (parseInt(data.installments) != data.installments) return res.status(400).send({ status: false, message: "installments should only be a Number" })
-            }
+            
+            if (parseInt(data.installments) != data.installments) return res.status(400).send({ status: false, message: "installments should only be a Number" })
+            
             updateProduct.installments = data.installments
         }
         let finalProduct = await productModel.findOneAndUpdate({ _id: productId }, updateProduct, { new: true })

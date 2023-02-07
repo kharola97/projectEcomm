@@ -1,8 +1,8 @@
 
 const isValid= function(value){
     if(!value || value==null) return false
-    if(value==Number) return false
-    if(value==String && value.trim()=="") return false
+    if(typeof(value)=='number') return false
+    if(typeof(value)=='string' && value.trim()=="") return false
     
     return true
 }

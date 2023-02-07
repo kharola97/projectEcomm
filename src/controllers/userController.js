@@ -76,22 +76,22 @@ const createUser = async (req, res) => {
 
     if(!data.address) return res.status(400).send({status:false,message:"address is mandatory"})
     
-    if(typeof(data.password)==String) data.address=JSON.parse(data.address)
-   
+    if(typeof(data.address)=='string') data.address=JSON.parse(data.address)
+   console.log(data.address)
 
     if (!isValid(data.address.shipping.street)) return res.status(400).send({ status: false, message: "shipping address street is mandatory" });
     if (!isValid(data.address.shipping.city)) return res.status(400).send({ status: false, message: "shipping address city is mandatory" });
     if (!data.address.shipping.pincode) return res.status(400).send({ status: false, message: "shipping address pincode is mandatory" });
-    if (parseInt(data.address.shipping.pincode) != data.address.shipping.pincode ||updationDetails.address.shipping.pincode.length!=6) return res.status(400).send({ status: false, message: "shipping address pincode should only be Number" });
+    if (parseInt(data.address.shipping.pincode) != data.address.shipping.pincode) return res.status(400).send({ status: false, message: "shipping address pincode should only be Number" });
+    if(data.address.shipping.pincode.trim().length!=6)return res.status(400).send({ status: false, message: "shipping address pincode should be length 6" });
 
     if (!isValid(data.address.billing.street)) return res.status(400).send({ status: false, message: "billing address street is mandatory" });
     if (!isValid(data.address.billing.city)) return res.status(400).send({ status: false, message: "billing address city is mandatory" });
     if (!data.address.billing.pincode) return res.status(400).send({ status: false, message: "billing address pincode is mandatory" });
-    if (parseInt(data.address.billing.pincode) != data.address.billing.pincode || updationDetails.address.billing.pincode.length!=6) return res.status(400).send({ status: false, message: "billing address pincode should only be Number" });
+    if (parseInt(data.address.billing.pincode) != data.address.billing.pincode) return res.status(400).send({ status: false, message: "billing address pincode should only be Number" });
+    if(data.address.billing.pincode.trim().length!=6)return res.status(400).send({ status: false, message: "billing address pincode should be length 6" });
 
 
-    data.fname = data.fname.toLowerCase();
-    data.lname = data.lname.toLowerCase()
     data.email = data.email.toLowerCase()
 
 
@@ -107,7 +107,7 @@ const createUser = async (req, res) => {
     /*---------------------------------------------------------------------------------------*/
     let createUser = await UserModel.create(data);
 
-    return res.status(201).send({ status: true, message: `This user is created sucessfully.`, data: createUser, });
+    return res.status(201).send({ status: true, message:"User created successfully", data: createUser});
   } catch (error) {
     return res.status(500).send({ status: false, message: error.message });
   }
@@ -121,6 +121,10 @@ const login = async function (req, res) {
     let body = req.body
     if (Object.keys(body).length == 0) return res.status(400).send({ status: false, message: "Please enter some data" })
     if (!body.email || !body.password) return res.status(400).send({ status: false, message: "Please enter email and password" })
+
+
+    
+    if (!validator.isEmail(body.email)) return res.status(400).send({ status: false, msg: "please enter email correctly" })
 
     let findUser = await UserModel.findOne({ email: body.email })
     if (!findUser) return res.status(400).send({ status: false, message: "Invalid email or password" })
@@ -174,7 +178,8 @@ const updateUser = async function (req, res) {
     let updationDetails= req.body
     const file=req.files
     let dataForUpdate={}
-    if(Object.keys(updationDetails).length==0) return res.status(400).send({status:false,message:"please provide details for updation"})
+    console.log(file)
+    if(Object.keys(updationDetails).length==0 && file==undefined) return res.status(400).send({status:false,message:"please provide details for updation"})
     const userData = await UserModel.findById(userId)
     if (!userData) return res.status(404).send({ status: true, message: "User not found" })
  
@@ -227,19 +232,22 @@ const updateUser = async function (req, res) {
     }
 
 
-    if(typeof(updationDetails.password)==String) updationDetails.address=JSON.parse(updationDetails.address)
-
+  
+    
 
     if(updationDetails.address){
-      updationDetails.address=JSON.parse(updationDetails.address)
+      if(typeof(updationDetails.address)=='string') updationDetails.address=JSON.parse(updationDetails.address)
+
       
       let shippingAdd= userData.address.shipping
+      
       
       if(updationDetails.address.shipping){
         if(updationDetails.address.shipping.street) shippingAdd.street=updationDetails.address.shipping.street
         if(updationDetails.address.shipping.city) shippingAdd.city=updationDetails.address.shipping.city
         if(updationDetails.address.shipping.pincode) {
-          if(parseInt(updationDetails.address.shipping.pincode)!=updationDetails.address.shipping.pincode || updationDetails.address.shipping.pincode.length!=6) return res.status(400).send({status:false,message:" shipping pincode is invalid"})
+          if(parseInt(updationDetails.address.shipping.pincode)!=updationDetails.address.shipping.pincode) return res.status(400).send({status:false,message:" shipping pincode is invalid"})
+          if(updationDetails.address.shipping.pincode.trim().length!=6) return  res.status(400).send({status:false,message:"shipping pincode length should be 6"})
           shippingAdd.pincode=updationDetails.address.shipping.pincode
         }
         
@@ -250,7 +258,8 @@ const updateUser = async function (req, res) {
         if(updationDetails.address.billing.street) billingAdd.street=updationDetails.address.billing.street
         if(updationDetails.address.billing.city) billingAdd.city=updationDetails.address.billing.city
         if(updationDetails.address.billing.pincode) {
-          if(parseInt(updationDetails.address.billing.pincode)!=updationDetails.address.billing.pincode || updationDetails.address.billing.pincode.length!=6) return  res.status(400).send({status:false,message:"billing pincode is invalid"})
+          if(parseInt(updationDetails.address.billing.pincode)!=updationDetails.address.billing.pincode ) return  res.status(400).send({status:false,message:"billing pincode is invalid"})
+          if(updationDetails.address.billing.pincode.trim().length!=6) return  res.status(400).send({status:false,message:"billing pincode length should be 6"})
           billingAdd.pincode=updationDetails.address.billing.pincode
         }
         
