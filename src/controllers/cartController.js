@@ -40,12 +40,12 @@ const createCart =async function(req,res){
             const product = items.filter(x => x.productId == data.productId)
             if (product.length == 0) {
                 items.push({ productId: data.productId, quantity: 1 })
-                const updatedCart = await cartModel.findOneAndUpdate({ userId: data.userId }, { $set: { items: items }, $inc: { totalPrice: productData.price, totalItems: 1 } }, { new: true }).populate('items.productId')
+                const updatedCart = await cartModel.findOneAndUpdate({ userId: userId }, { $set: { items: items }, $inc: { totalPrice: productData.price, totalItems: 1 } }, { new: true }).populate('items.productId')
                 return res.status(200).send({ status: true, message: "Success", data: updatedCart })
             }
             else {
                 product[0].quantity = product[0].quantity + 1
-                const updatedCart = await cartModel.findOneAndUpdate({ userId: data.userId }, { $set: { items: items }, $inc: { totalPrice: productData.price} }, { new: true }).populate('items.productId')
+                const updatedCart = await cartModel.findOneAndUpdate({ userId: userId }, { $set: { items: items }, $inc: { totalPrice: productData.price} }, { new: true }).populate('items.productId')
                 return res.status(200).send({ status: true, message: "Success", data: updatedCart })
             }
         }
