@@ -30,7 +30,7 @@ const createCart =async function(req,res){
     
     
     
-        const cart = await cartModel.findOne({ userId: data.userId })
+        const cart = await cartModel.findOne({ userId: userId })
     
         const productData = await productModel.findOne({ _id: data.productId, isDeleted: false })
     
@@ -40,12 +40,12 @@ const createCart =async function(req,res){
             const product = items.filter(x => x.productId == data.productId)
             if (product.length == 0) {
                 items.push({ productId: data.productId, quantity: 1 })
-                const updatedCart = await cartModel.findOneAndUpdate({ userId: data.userId }, { $set: { items: items }, $inc: { totalPrice: productData.price, totalItems: 1 } }, { new: true }).populate('items.productId')
+                const updatedCart = await cartModel.findOneAndUpdate({ userId: userId }, { $set: { items: items }, $inc: { totalPrice: productData.price, totalItems: 1 } }, { new: true }).populate('items.productId')
                 return res.status(200).send({ status: true, message: "Success", data: updatedCart })
             }
             else {
                 product[0].quantity = product[0].quantity + 1
-                const updatedCart = await cartModel.findOneAndUpdate({ userId: data.userId }, { $set: { items: items }, $inc: { totalPrice: productData.price} }, { new: true }).populate('items.productId')
+                const updatedCart = await cartModel.findOneAndUpdate({ userId: userId }, { $set: { items: items }, $inc: { totalPrice: productData.price} }, { new: true }).populate('items.productId')
                 return res.status(200).send({ status: true, message: "Success", data: updatedCart })
             }
         }
@@ -97,7 +97,7 @@ const removeProductFromCart = async function (req, res) {
     
         let items = checkCart.items
         let filteritem = items.filter(x => x.productId == productId)
-        if (filteritem.length == 0) return res.status(400).send({ status: false, message: "Product is exist in cart items" })
+        if (filteritem.length == 0) return res.status(400).send({ status: false, message: "Product is not exist in cart items" })
     
     
         if (removeProduct == '0' || filteritem[0].quantity==1) {
