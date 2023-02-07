@@ -56,6 +56,7 @@ const createProduct = async function (req, res) {
         if(!isValid(data.availableSizes)) return res.status(400).send({status:false,message:"atleast one size is required"})
         data.availableSizes = data.availableSizes.split(",")
         data.availableSizes = data.availableSizes.filter(x => x.trim() != "")
+        data.availableSizes=data.availableSizes.map(x=>x.trim())
         if (data.availableSizes.length == 0) return res.status(400).send({ status: false, message: "at least one size is required ['S', 'XS','M','X', 'L','XXL', 'XL']" })
         let newArr = data.availableSizes.filter(x => !["S", "XS", "M", "X", "L", "XXL", "XL"].includes(x))
         if (newArr.length != 0) return res.status(400).send({ status: false, message: `sizes ${newArr} should be presented in ["S","XS","M","X","L","XXL","XL"] ` })
