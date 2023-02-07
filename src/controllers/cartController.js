@@ -30,7 +30,7 @@ const createCart =async function(req,res){
     
     
     
-        const cart = await cartModel.findOne({ userId: data.userId })
+        const cart = await cartModel.findOne({ userId: userId })
     
         const productData = await productModel.findOne({ _id: data.productId, isDeleted: false })
     
@@ -97,7 +97,7 @@ const removeProductFromCart = async function (req, res) {
     
         let items = checkCart.items
         let filteritem = items.filter(x => x.productId == productId)
-        if (filteritem.length == 0) return res.status(400).send({ status: false, message: "Product is exist in cart items" })
+        if (filteritem.length == 0) return res.status(400).send({ status: false, message: "Product is not exist in cart items" })
     
     
         if (removeProduct == '0' || filteritem[0].quantity==1) {
