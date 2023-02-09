@@ -17,7 +17,7 @@ const createCart =async function(req,res){
         if(data.cartId) {
             if(!ObjectId.isValid(data.cartId)) return res.status(400).send({status:false,message:"cart Id is not valid"})
             const cartByCartId= await cartModel.findById(data.cartId)
-            if(!cartByCartId) return res.status(400).send({status:false,message:"cart id Wrong in body"})
+            if(!cartByCartId) return res.status(404).send({status:false,message:"cart id Wrong in body"})
 
             //second layer authorization
 
@@ -26,7 +26,7 @@ const createCart =async function(req,res){
 
         }
         const user = await userModel.findOne({ _id: userId })
-        if (!user) return res.status(400).send({ status: false, message: "user not found" })
+        if (!user) return res.status(404).send({ status: false, message: "user not exist" })
     
         
 

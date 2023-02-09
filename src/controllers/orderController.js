@@ -15,6 +15,17 @@ const createOrder= async function(req,res){
         let bodyData= req.body
         let createOrder ={}
         if(!ObjectId.isValid(userId)) return res.status(400).send({status:false,message:"userId invalid"})
+
+        if(bodyData.cartId){
+            if(!ObjectId.isValid(bodyData.cartId)) return res.status(400).send({status:false,message:"userId invalid"})
+            const cartByCartId= await cartModel.findById(bodyData.cartId)
+            if(!cartByCartId) return res.status(404).send({status:false,message:"cart id Wrong in body"})
+
+            //second layer authorization
+
+            if(cartByCartId.userId!=userId) return res.status(403).send({status:false,message:"you can not authorised to create order with anthor user cart"})
+
+        }
     
         const user = await userModel.findById(userId)
         if(!user) return res.status(404).send({status:true, message:"user not  found"});
@@ -42,6 +53,7 @@ const createOrder= async function(req,res){
         }
     
         const orderCreated= await (await orderModel.create(createOrder)).populate('items.productId')
+        await cartModel.findOneAndUpdate({userId: userId},{$set:{items:[],totalPrice: 0, totalItems: 0}},{new: true})
         res.status(201).send({status:true,message:"Success",data:orderCreated})
     
     }

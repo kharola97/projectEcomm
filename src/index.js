@@ -22,9 +22,6 @@ mongoose.connect("mongodb+srv://tarun21:tarun1616@cluster0.h0l8mir.mongodb.net/g
 app.use('/',route)
 
 
-
-
-
 app.listen(3000,function(){
     console.log("server running on ",3000)
 })

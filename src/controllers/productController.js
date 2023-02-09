@@ -220,7 +220,7 @@ const updateProduct = async function (req, res) {
         
     
         if (data.availableSizes) {
-            let productSizes=findProduct.availableSizes
+            // let productSizes=findProduct.availableSizes
             data.availableSizes = data.availableSizes.split(",")
             data.availableSizes = data.availableSizes.filter(x => x.trim() != "").map(x=>x.trim().toUpperCase())
             
@@ -228,9 +228,9 @@ const updateProduct = async function (req, res) {
             let newArr = data.availableSizes.filter(x => !["S", "XS", "M", "X", "L", "XXL", "XL"].includes(x))
             if (newArr.length != 0) return res.status(400).send({ status: false, message: `sizes ${newArr} should be presented in ["S","XS","M","X","L","XXL","XL"] ` })
             
-            let sizes = [...productSizes,...data.availableSizes]
-            sizes=sizes.filter((item, index) => sizes.indexOf(item) === index);
-            updateProduct.availableSizes=sizes
+            // let sizes = [...productSizes,...data.availableSizes]
+            // sizes=sizes.filter((item, index) => sizes.indexOf(item) === index);
+            updateProduct.availableSizes=data.availableSizes
         }
         if (data.installments) {
             
