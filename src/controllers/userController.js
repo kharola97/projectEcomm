@@ -47,7 +47,7 @@ const createUser = async (req, res) => {
     if (!(data.lname).match(/^[a-zA-Z_ ]+$/)) return res.status(400).send({ status: false, message: "give valid name" });
     //check validation for email ---------------------------------------------------------------
     if (!isValid(data.email)) return res.status(400).send({ status: false, message: "email is mandatory" });
-    if (!validator.isEmail(data.email)) return res.status(400).send({ status: false, msg: "please enter valid email address!" })
+    if (!validator.isEmail(data.email.trim())) return res.status(400).send({ status: false, msg: "please enter valid email address!" })
 
     if (files.length == 0) return res.status(400).send({ status: false, message: "profile image  is mandatory" });
 
@@ -59,7 +59,7 @@ const createUser = async (req, res) => {
 
     /*----------------------------------- Checking Unique -----------------------------*/
 
-    const email = await UserModel.findOne({ email: data.email });
+    const email = await UserModel.findOne({ email: data.email.trim().toLowerCase() });
     if (email) return res.status(400).send({ status: false, message: "email already exist" })
 
     const phone = await UserModel.findOne({ phone: data.phone });
@@ -124,9 +124,9 @@ const login = async function (req, res) {
 
 
     
-    if (!validator.isEmail(body.email)) return res.status(400).send({ status: false, msg: "please enter email correctly" })
+    if (!validator.isEmail(body.email.trim())) return res.status(400).send({ status: false, msg: "please enter email correctly" })
 
-    let findUser = await UserModel.findOne({ email: body.email })
+    let findUser = await UserModel.findOne({ email: body.email.trim().toLowerCase() })
     if (!findUser) return res.status(400).send({ status: false, message: "Invalid email or password" })
     bcrypt.compare(body.password, findUser.password, function (err, result) {  // Compare
       // if passwords match
