@@ -37,7 +37,7 @@ const createUser = async (req, res) => {
     let data = req.body;
     let files = req.files;
     let fields = Object.keys(data);
-    if (fields.length == 0) return res.status(400).send({ status: false, message: "Please provide data for create the user." });
+    if (fields.length == 0) return res.status(400).send({ status: false, message: "Please provide data for creating the user." });
 
 
     if (!isValid(data.fname)) return res.status(400).send({ status: false, message: "fname is mandatory" });

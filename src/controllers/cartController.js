@@ -44,11 +44,8 @@ const createCart =async function(req,res){
     
         if (!productData) return res.status(404).send({ status: false, message: "product not found" })
         if (cart) {
-                
-
-            //second layer authorization
-            
-            if(cart._id!=data.cartId) return res.status(403).send({status:false,message:"you can not authorised to add product to anthor user cart"})
+        //second layer authorization
+        //if(cart._id!=data.cartId) return res.status(403).send({status:false,message:"you can not authorised to add product to anthor user cart"})
 
             let items = cart.items
             const product = items.filter(x => x.productId == data.productId)
@@ -170,10 +167,7 @@ const deleteCart= async function(req,res){
 
         const user = await userModel.findById(userId)
         if(!user) return res.status(404).send({status:true, message:"user not  found"});
-
-
-
-        const cart = await cartModel.findOne({userId: userId})
+   const cart = await cartModel.findOne({userId: userId})
         if(!cart) return res.status(404).send({status:true, message:"cart not found "});
 
         if(cart.items.length==0 && cart.totalPrice==0 && cart.totalItems==0) return res.status(400).send({status:false,message:"cart already empty"})
